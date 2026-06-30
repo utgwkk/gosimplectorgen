@@ -176,6 +176,27 @@ func collectPackagesFromExpr(expr ast.Expr, used map[string]bool) {
 		for _, index := range e.Indices {
 			collectPackagesFromExpr(index, used)
 		}
+	case *ast.ParenExpr:
+		collectPackagesFromExpr(e.X, used)
+	case *ast.Ellipsis:
+		collectPackagesFromExpr(e.Elt, used)
+	case *ast.FuncType:
+		collectPackagesFromFieldList(e.TypeParams, used)
+		collectPackagesFromFieldList(e.Params, used)
+		collectPackagesFromFieldList(e.Results, used)
+	case *ast.InterfaceType:
+		collectPackagesFromFieldList(e.Methods, used)
+	case *ast.StructType:
+		collectPackagesFromFieldList(e.Fields, used)
+	}
+}
+
+func collectPackagesFromFieldList(fields *ast.FieldList, used map[string]bool) {
+	if fields == nil {
+		return
+	}
+	for _, field := range fields.List {
+		collectPackagesFromExpr(field.Type, used)
 	}
 }
 
