@@ -9,8 +9,6 @@ import (
 	"github.com/utgwkk/gosimplectorgen/internal/generator"
 )
 
-var Version = "HEAD"
-
 func main() {
 	out := flag.String("out", "", "output file (default: <input>_gen.go)")
 	targetTypes := flag.String("targetTypes", "", "comma-separated list of struct type names to generate constructors for (default: all structs)")
