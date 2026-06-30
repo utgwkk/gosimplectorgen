@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/utgwkk/ghq/github.com/utgwkk/gosimplectorgen/.claude/hooks/post-edit.sh",
+            "command": ".claude/hooks/post-edit.sh",
             "statusMessage": "Running gofmt..."
           }
         ]
