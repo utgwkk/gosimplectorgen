@@ -2,15 +2,11 @@ package generator_test
 
 import (
 	"bytes"
-	"flag"
-	"os"
-	"strings"
 	"testing"
 
+	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/utgwkk/gosimplectorgen/internal/generator"
 )
-
-var update = flag.Bool("update", false, "update golden files")
 
 func TestGenerate(t *testing.T) {
 	cases := []struct {
@@ -28,22 +24,7 @@ func TestGenerate(t *testing.T) {
 			if err := g.Generate(); err != nil {
 				t.Fatalf("Generate: %v", err)
 			}
-
-			goldenPath := strings.TrimSuffix(tc.input, ".go") + ".golden"
-			if *update {
-				if err := os.WriteFile(goldenPath, buf.Bytes(), 0644); err != nil {
-					t.Fatalf("write golden: %v", err)
-				}
-			}
-
-			want, err := os.ReadFile(goldenPath)
-			if err != nil {
-				t.Fatalf("read golden: %v", err)
-			}
-
-			if got := buf.Bytes(); !bytes.Equal(got, want) {
-				t.Errorf("output mismatch\ngot:\n%s\nwant:\n%s", got, want)
-			}
+			snaps.MatchSnapshot(t, buf.String())
 		})
 	}
 }
