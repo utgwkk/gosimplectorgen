@@ -10,6 +10,8 @@ import (
 	"io"
 	"slices"
 	"strings"
+
+	"golang.org/x/tools/go/ast/inspector"
 )
 
 type Generator struct {
@@ -41,41 +43,32 @@ func (g *Generator) Generate() error {
 		return fmt.Errorf("parser.ParseFile: %w", err)
 	}
 
+	in := inspector.New([]*ast.File{f})
 	var structs []structInfo
-	for _, decl := range f.Decls {
-		genDecl, ok := decl.(*ast.GenDecl)
-		if !ok || genDecl.Tok != token.TYPE {
+	for typeSpec := range inspector.All[*ast.TypeSpec](in) {
+		structType, ok := typeSpec.Type.(*ast.StructType)
+		if !ok {
 			continue
 		}
-		for _, spec := range genDecl.Specs {
-			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				continue
-			}
-			structType, ok := typeSpec.Type.(*ast.StructType)
-			if !ok {
-				continue
-			}
-			if !g.isTargetType(typeSpec.Name.Name) {
-				continue
-			}
-			var fields []fieldInfo
-			for _, field := range structType.Fields.List {
-				if len(field.Names) == 0 {
-					continue
-				}
-				for _, name := range field.Names {
-					fields = append(fields, fieldInfo{
-						name: name.Name,
-						typ:  field.Type,
-					})
-				}
-			}
-			structs = append(structs, structInfo{
-				name:   typeSpec.Name.Name,
-				fields: fields,
-			})
+		if !g.isTargetType(typeSpec.Name.Name) {
+			continue
 		}
+		var fields []fieldInfo
+		for _, field := range structType.Fields.List {
+			if len(field.Names) == 0 {
+				continue
+			}
+			for _, name := range field.Names {
+				fields = append(fields, fieldInfo{
+					name: name.Name,
+					typ:  field.Type,
+				})
+			}
+		}
+		structs = append(structs, structInfo{
+			name:   typeSpec.Name.Name,
+			fields: fields,
+		})
 	}
 
 	var buf bytes.Buffer

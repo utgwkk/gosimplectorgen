@@ -1,8 +1,11 @@
 module github.com/utgwkk/gosimplectorgen
 
-go 1.25
+go 1.25.0
 
-require github.com/gkampitakis/go-snaps v0.5.22
+require (
+	github.com/gkampitakis/go-snaps v0.5.22
+	golang.org/x/tools v0.47.0
+)
 
 require (
 	github.com/gkampitakis/ciinfo v0.3.4 // indirect
