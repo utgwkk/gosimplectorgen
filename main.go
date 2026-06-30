@@ -14,7 +14,13 @@ var Version = "HEAD"
 func main() {
 	out := flag.String("out", "", "output file (default: <input>_gen.go)")
 	targetTypes := flag.String("targetTypes", "", "comma-separated list of struct type names to generate constructors for (default: all structs)")
+	version := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
+
+	if *version {
+		fmt.Println(Version)
+		return
+	}
 
 	if flag.NArg() != 1 {
 		fmt.Fprintln(os.Stderr, "usage: gosimplectorgen [-out <output.go>] [-targetTypes <Type1,Type2>] <input.go>")
