@@ -104,7 +104,7 @@ A live copy of this example lives in the [`example/`](./example) directory.
 - Fields become positional parameters in declaration order. Multi-name field declarations (`a, b int`) are expanded into separate parameters.
 - Embedded (anonymous) fields are skipped.
 - Field types are preserved from the original AST, so generics, pointers, slices, maps, channels, and function types all work without special handling.
-- All `import` declarations from the source file are copied verbatim into the generated file, even if no constructor references them. In pathological cases this may produce an unused-import compile error.
+- Only `import` declarations that are referenced by the generated constructors are included in the output file.
 - Constructor names are always exported (`NewXxx`), even when the struct itself is unexported.
 
 ## License

@@ -84,9 +84,16 @@ func (g *Generator) Generate() error {
 	fmt.Fprintf(&buf, "package %s\n", f.Name.Name)
 	fmt.Fprintln(&buf)
 
-	if len(f.Imports) > 0 {
+	usedPkgs := collectUsedPackages(structs)
+	var usedImports []*ast.ImportSpec
+	for _, imp := range f.Imports {
+		if usedPkgs[importPackageName(imp)] {
+			usedImports = append(usedImports, imp)
+		}
+	}
+	if len(usedImports) > 0 {
 		fmt.Fprintln(&buf, "import (")
-		for _, imp := range f.Imports {
+		for _, imp := range usedImports {
 			if imp.Name != nil {
 				fmt.Fprintf(&buf, "\t%s %s\n", imp.Name.Name, imp.Path.Value)
 			} else {
@@ -129,6 +136,43 @@ func (g *Generator) isTargetType(typename string) bool {
 		return true
 	}
 	return slices.Contains(g.targetTypes, typename)
+}
+
+func collectUsedPackages(structs []structInfo) map[string]bool {
+	used := make(map[string]bool)
+	for _, s := range structs {
+		for _, field := range s.fields {
+			collectPackagesFromExpr(field.typ, used)
+		}
+	}
+	return used
+}
+
+func collectPackagesFromExpr(expr ast.Expr, used map[string]bool) {
+	switch e := expr.(type) {
+	case *ast.SelectorExpr:
+		if ident, ok := e.X.(*ast.Ident); ok {
+			used[ident.Name] = true
+		}
+	case *ast.StarExpr:
+		collectPackagesFromExpr(e.X, used)
+	case *ast.ArrayType:
+		collectPackagesFromExpr(e.Elt, used)
+	case *ast.MapType:
+		collectPackagesFromExpr(e.Key, used)
+		collectPackagesFromExpr(e.Value, used)
+	case *ast.ChanType:
+		collectPackagesFromExpr(e.Value, used)
+	}
+}
+
+func importPackageName(imp *ast.ImportSpec) string {
+	if imp.Name != nil {
+		return imp.Name.Name
+	}
+	path := imp.Path.Value[1 : len(imp.Path.Value)-1] // strip quotes
+	parts := strings.Split(path, "/")
+	return parts[len(parts)-1]
 }
 
 func constructorName(typeName string) string {

@@ -17,6 +17,7 @@ func TestGenerate(t *testing.T) {
 		{name: "no_imports", input: "testdata/no_imports.go"},
 		{name: "with_imports", input: "testdata/with_imports.go"},
 		{name: "filter_types", input: "testdata/multiple_structs.go", targetTypes: []string{"foo", "baz"}},
+		{name: "unused_imports_removed", input: "testdata/with_unused_imports.go"},
 	}
 
 	for _, tc := range cases {
