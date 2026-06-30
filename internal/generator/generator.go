@@ -18,8 +18,6 @@ type Generator struct {
 	srcFile string
 
 	targetTypes []string
-
-	imports []string
 }
 
 func New(w io.Writer, srcFile string) *Generator {
