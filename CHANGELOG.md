@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.0.3](https://github.com/utgwkk/gosimplectorgen/compare/v0.0.2...v0.0.3) - 2026-06-30
+
+- Use relative path for post-edit hook script by @utgwkk in https://github.com/utgwkk/gosimplectorgen/pull/10
+- Use imports.Process for formatting and fix import ordering by @utgwkk in https://github.com/utgwkk/gosimplectorgen/pull/12
+- Add project overview to CLAUDE.md by @utgwkk in https://github.com/utgwkk/gosimplectorgen/pull/13
+- refactor: extract emit steps into private helpers in generator.go by @utgwkk in https://github.com/utgwkk/gosimplectorgen/pull/14
+
 ## [v0.0.2](https://github.com/utgwkk/gosimplectorgen/compare/v0.0.1...v0.0.2) - 2026-06-30
 
 - Extend package collection to handle complex type expressions by @utgwkk in https://github.com/utgwkk/gosimplectorgen/pull/3
