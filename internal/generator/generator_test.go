@@ -20,7 +20,7 @@ func TestGenerate(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			g := generator.New(&buf, tc.input)
+			g := generator.New(&buf, tc.input, nil)
 			if err := g.Generate(); err != nil {
 				t.Fatalf("Generate: %v", err)
 			}

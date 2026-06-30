@@ -20,8 +20,8 @@ type Generator struct {
 	targetTypes []string
 }
 
-func New(w io.Writer, srcFile string) *Generator {
-	return &Generator{w: w, srcFile: srcFile}
+func New(w io.Writer, srcFile string, targetTypes []string) *Generator {
+	return &Generator{w: w, srcFile: srcFile, targetTypes: targetTypes}
 }
 
 type fieldInfo struct {

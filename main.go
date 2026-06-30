@@ -11,10 +11,11 @@ import (
 
 func main() {
 	out := flag.String("out", "", "output file (default: <input>_gen.go)")
+	targetTypes := flag.String("targetTypes", "", "comma-separated list of struct type names to generate constructors for (default: all structs)")
 	flag.Parse()
 
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: gosimplectorgen [-out <output.go>] <input.go>")
+		fmt.Fprintln(os.Stderr, "usage: gosimplectorgen [-out <output.go>] [-targetTypes <Type1,Type2>] <input.go>")
 		os.Exit(2)
 	}
 	srcFile := flag.Arg(0)
@@ -27,6 +28,11 @@ func main() {
 		outFile = strings.TrimSuffix(srcFile, ".go") + "_gen.go"
 	}
 
+	var types []string
+	if *targetTypes != "" {
+		types = strings.Split(*targetTypes, ",")
+	}
+
 	f, err := os.Create(outFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "create output: %v\n", err)
@@ -34,7 +40,7 @@ func main() {
 	}
 	defer f.Close()
 
-	g := generator.New(f, srcFile)
+	g := generator.New(f, srcFile, types)
 	if err := g.Generate(); err != nil {
 		fmt.Fprintf(os.Stderr, "generate: %v\n", err)
 		os.Exit(1)
