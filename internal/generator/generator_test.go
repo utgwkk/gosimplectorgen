@@ -25,6 +25,7 @@ func TestGenerate(t *testing.T) {
 		{name: "exported_and_multiname", input: "testdata/exported_and_multiname.go"},
 		{name: "with_aliased_imports", input: "testdata/with_aliased_imports.go"},
 		{name: "non_struct_types", input: "testdata/non_struct_types.go"},
+		{name: "with_mixed_imports", input: "testdata/with_mixed_imports.go"},
 	}
 
 	for _, tc := range cases {

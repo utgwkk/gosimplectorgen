@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"go/ast"
-	"go/format"
 	"go/parser"
 	"go/token"
 	"io"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	"golang.org/x/tools/go/ast/inspector"
+	"golang.org/x/tools/imports"
 )
 
 type Generator struct {
@@ -102,7 +102,7 @@ func (g *Generator) Generate() error {
 		for _, field := range s.fields {
 			// Extract the type string by slicing the source bytes directly,
 			// avoiding the allocation cost of go/printer + tabwriter per field.
-			// format.Source at the end normalises any whitespace irregularities.
+			// imports.Process at the end normalises any whitespace irregularities.
 			start := fset.Position(field.typ.Pos()).Offset
 			end := fset.Position(field.typ.End()).Offset
 			typeStr := string(src[start:end])
@@ -133,9 +133,9 @@ func (g *Generator) Generate() error {
 		buf.WriteString("\n")
 	}
 
-	formatted, err := format.Source(buf.Bytes())
+	formatted, err := imports.Process("", buf.Bytes(), nil)
 	if err != nil {
-		return fmt.Errorf("format.Source: %w\n%s", err, buf.String())
+		return fmt.Errorf("imports.Process: %w\n%s", err, buf.String())
 	}
 	_, err = g.w.Write(formatted)
 	return err
