@@ -168,6 +168,14 @@ func collectPackagesFromExpr(expr ast.Expr, used map[string]bool) {
 		collectPackagesFromExpr(e.Value, used)
 	case *ast.ChanType:
 		collectPackagesFromExpr(e.Value, used)
+	case *ast.IndexExpr:
+		collectPackagesFromExpr(e.X, used)
+		collectPackagesFromExpr(e.Index, used)
+	case *ast.IndexListExpr:
+		collectPackagesFromExpr(e.X, used)
+		for _, index := range e.Indices {
+			collectPackagesFromExpr(index, used)
+		}
 	}
 }
 
