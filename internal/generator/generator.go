@@ -154,50 +154,14 @@ func collectUsedPackages(structs []structInfo) map[string]bool {
 }
 
 func collectPackagesFromExpr(expr ast.Expr, used map[string]bool) {
-	switch e := expr.(type) {
-	case *ast.SelectorExpr:
-		if ident, ok := e.X.(*ast.Ident); ok {
-			used[ident.Name] = true
+	ast.Inspect(expr, func(n ast.Node) bool {
+		if sel, ok := n.(*ast.SelectorExpr); ok {
+			if ident, ok := sel.X.(*ast.Ident); ok {
+				used[ident.Name] = true
+			}
 		}
-	case *ast.StarExpr:
-		collectPackagesFromExpr(e.X, used)
-	case *ast.ArrayType:
-		collectPackagesFromExpr(e.Elt, used)
-	case *ast.MapType:
-		collectPackagesFromExpr(e.Key, used)
-		collectPackagesFromExpr(e.Value, used)
-	case *ast.ChanType:
-		collectPackagesFromExpr(e.Value, used)
-	case *ast.IndexExpr:
-		collectPackagesFromExpr(e.X, used)
-		collectPackagesFromExpr(e.Index, used)
-	case *ast.IndexListExpr:
-		collectPackagesFromExpr(e.X, used)
-		for _, index := range e.Indices {
-			collectPackagesFromExpr(index, used)
-		}
-	case *ast.ParenExpr:
-		collectPackagesFromExpr(e.X, used)
-	case *ast.Ellipsis:
-		collectPackagesFromExpr(e.Elt, used)
-	case *ast.FuncType:
-		collectPackagesFromFieldList(e.TypeParams, used)
-		collectPackagesFromFieldList(e.Params, used)
-		collectPackagesFromFieldList(e.Results, used)
-	case *ast.InterfaceType:
-		collectPackagesFromFieldList(e.Methods, used)
-	case *ast.StructType:
-		collectPackagesFromFieldList(e.Fields, used)
-	}
-}
-
-func collectPackagesFromFieldList(fields *ast.FieldList, used map[string]bool) {
-	if fields == nil {
-		return
-	}
-	for _, field := range fields.List {
-		collectPackagesFromExpr(field.Type, used)
-	}
+		return true
+	})
 }
 
 func importPackageName(imp *ast.ImportSpec) string {
