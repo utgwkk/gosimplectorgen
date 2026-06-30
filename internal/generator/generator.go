@@ -44,33 +44,7 @@ func (g *Generator) Generate() error {
 		return fmt.Errorf("parser.ParseFile: %w", err)
 	}
 
-	in := inspector.New([]*ast.File{f})
-	var structs []structInfo
-	for typeSpec := range inspector.All[*ast.TypeSpec](in) {
-		structType, ok := typeSpec.Type.(*ast.StructType)
-		if !ok {
-			continue
-		}
-		if !g.isTargetType(typeSpec.Name.Name) {
-			continue
-		}
-		var fields []fieldInfo
-		for _, field := range structType.Fields.List {
-			if len(field.Names) == 0 {
-				continue
-			}
-			for _, name := range field.Names {
-				fields = append(fields, fieldInfo{
-					name: name.Name,
-					typ:  field.Type,
-				})
-			}
-		}
-		structs = append(structs, structInfo{
-			name:   typeSpec.Name.Name,
-			fields: fields,
-		})
-	}
+	structs := g.collectStructInfo(f)
 
 	var buf bytes.Buffer
 
@@ -135,6 +109,37 @@ func (g *Generator) Generate() error {
 	}
 	_, err = g.w.Write(formatted)
 	return err
+}
+
+func (g *Generator) collectStructInfo(f *ast.File) []structInfo {
+	var structs []structInfo
+	in := inspector.New([]*ast.File{f})
+	for typeSpec := range inspector.All[*ast.TypeSpec](in) {
+		structType, ok := typeSpec.Type.(*ast.StructType)
+		if !ok {
+			continue
+		}
+		if !g.isTargetType(typeSpec.Name.Name) {
+			continue
+		}
+		var fields []fieldInfo
+		for _, field := range structType.Fields.List {
+			if len(field.Names) == 0 {
+				continue
+			}
+			for _, name := range field.Names {
+				fields = append(fields, fieldInfo{
+					name: name.Name,
+					typ:  field.Type,
+				})
+			}
+		}
+		structs = append(structs, structInfo{
+			name:   typeSpec.Name.Name,
+			fields: fields,
+		})
+	}
+	return structs
 }
 
 func (g *Generator) isTargetType(typename string) bool {
