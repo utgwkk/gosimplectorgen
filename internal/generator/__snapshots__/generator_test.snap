@@ -232,8 +232,9 @@ package testpkg
 
 import (
     "context"
-    "example.com/foo"
     "time"
+
+    "example.com/foo"
 )
 
 func NewMyStruct(
