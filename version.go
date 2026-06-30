@@ -1,3 +1,3 @@
 package main
 
-var versionStr = "0.0.0"
+const versionStr = "0.0.0"
