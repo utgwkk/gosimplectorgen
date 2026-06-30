@@ -1,2 +1,2 @@
 [tagpr]
-versionFile = version.go
+	versionFile = version.go
