@@ -9,6 +9,7 @@ import (
 	"go/token"
 	"io"
 	"slices"
+	"strconv"
 	"strings"
 
 	"golang.org/x/tools/go/ast/inspector"
@@ -168,9 +169,10 @@ func importPackageName(imp *ast.ImportSpec) string {
 	if imp.Name != nil {
 		return imp.Name.Name
 	}
-	path := imp.Path.Value[1 : len(imp.Path.Value)-1] // strip quotes
-	parts := strings.Split(path, "/")
-	return parts[len(parts)-1]
+	// NOTE: imp.Path.Value is always quoted
+	path, _ := strconv.Unquote(imp.Path.Value)
+	pkgName := path[strings.LastIndex(path, "/")+1:]
+	return pkgName
 }
 
 func constructorName(typeName string) string {
